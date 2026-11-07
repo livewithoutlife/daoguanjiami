@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导·管 加密器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: rgba(22, 26, 35, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 2rem 2rem 2.2rem;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            color: #f5e7c8;
+            letter-spacing: 2px;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #e6c97a, #b89b4b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.8rem;
+        }
+
+        .sub {
+            text-align: center;
+            color: #9aa3b5;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px dashed #3a4050;
+            padding-bottom: 0.8rem;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+
+        .io-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            color: #a6b0c2;
+            margin-left: 0.2rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: #0f121a;
+            border: 1.5px solid #303644;
+            border-radius: 1.2rem;
+            color: #e8eef9;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            resize: vertical;
+            min-height: 120px;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        textarea:focus {
+            border-color: #dbb960;
+            box-shadow: 0 0 0 3px rgba(219, 185, 96, 0.2), inset 0 2px 8px #000;
+        }
+
+        .row-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 0.4rem 0 0.2rem;
+        }
+
+        button {
+            background: #282e3c;
+            border: 1px solid #4b5162;
+            color: #eef3fc;
+            padding: 0.9rem 1.8rem;
+            border-radius: 3rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex: 1 1 auto;
+            min-width: 130px;
+            box-shadow: 0 4px 0 #0c0e12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        button:hover {
+            background: #323a4b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #0c0e12;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0c0e12;
+        }
+
+        .encrypt-btn {
+            background: #2d3e2d;
+            border-color: #608a5e;
+            color: #e1ffe0;
+        }
+
+        .encrypt-btn:hover {
+            background: #385238;
+        }
+
+        .decrypt-btn {
+            background: #2f2c3f;
+            border-color: #7e6a9e;
+            color: #f0e5ff;
+        }
+
+        .decrypt-btn:hover {
+            background: #3f3a54;
+        }
+
+        .clear-btn {
+            background: #3b2b2b;
+            border-color: #8e5e5e;
+            color: #ffdede;
+        }
+
+        .clear-btn:hover {
+            background: #4d3838;
+        }
+
+        .copy-btn {
+            background: #1e2f3a;
+            border-color: #4f7e9b;
+            color: #d4edff;
+            flex: 0.6;
+        }
+
+        .copy-btn:hover {
+            background: #264252;
+        }
+
+        .symbol-badge {
+            display: inline-block;
+            background: #f5e7c8;
+            color: #1f1b0e;
+            border-radius: 30px;
+            padding: 0.15rem 0.7rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0.15rem;
+            border: 1px solid #b89b4b;
+        }
+
+        .hint {
+            color: #7b8599;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 1.2rem;
+            font-style: italic;
+            border-top: 1px solid #282e3a;
+            padding-top: 1rem;
+        }
+
+        .hint i {
+            font-style: normal;
+            background: #1e2330;
+            padding: 0.15rem 0.5rem;
+            border-radius: 30px;
+            margin: 0 0.15rem;
+            color: #c7b27a;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>
+        <span>⚡</span> 导 · 管 <span>⚡</span>
+    </h1>
+    <div class="sub">用「导」「管」二字加密 / 解密</div>
+
+    <div class="io-area">
+        <!-- 输入区 -->
+        <div>
+            <label>📥 输入文本 (明文或密文)</label>
+            <textarea id="inputText" placeholder="例如：你好，世界！ 或 导导导管管管..."></textarea>
+        </div>
+
+        <!-- 按钮区 -->
+        <div class="row-buttons">
+            <button class="encrypt-btn" id="encryptBtn">🔒 加密 (→ 导管)</button>
+            <button class="decrypt-btn" id="decryptBtn">🔓 解密 (导管→)</button>
+        </div>
+        <div class="row-buttons">
+            <button class="clear-btn" id="clearBtn">🗑️ 清空</button>
+            <button class="copy-btn" id="copyBtn">📋 复制结果</button>
+        </div>
+
+        <!-- 输出区 -->
+        <div>
+            <label>📤 输出结果</label>
+            <textarea id="outputText" placeholder="结果将显示在这里..." readonly></textarea>
+        </div>
+    </div>
+    <div class="hint">
+        <i>加密规则</i> 每个字符 → 8 位二进制 → 0 变「导」 1 变「管」<br>
+        解密反之 · 仅支持可见字符及换行 · 长度需为 8 的倍数
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- 核心加密 / 解密 -----
+        // 字符 -> UTF-16 码点(16位) -> 高8位 + 低8位 -> 每个字节转8位二进制 -> 0=导,1=管
+        // 解密: 每8个「导管」还原一个字节，组合两个字节还原一个UTF-16字符
+
+        const SYMBOL_ZERO = '导';   // 0 用“导”表示
+        const SYMBOL_ONE = '管';    // 1 用“管”表示
+
+        // 加密函数: 将普通字符串转为“导管”密文
+        function encryptText(plain) {
+            if (!plain) return '';
+            let result = '';
+            // 遍历每个字符（包括换行、空格等，全部按UTF-16处理）
+            for (let i = 0; i < plain.length; i++) {
+                const code = plain.charCodeAt(i); // 0 ~ 65535
+                // 高8位 (code >> 8) & 0xFF
+                const highByte = (code >> 8) & 0xFF;
+                // 低8位
+                const lowByte = code & 0xFF;
+
+                // 将高字节转为8位二进制，再映射为导管
+                for (let bit = 7; bit >= 0; bit--) {
+                    const bitVal = (highByte >> bit) & 1;
+                    result += bitVal === 0 ? SYMBOL_ZERO : SYMBOL_ONE;
+                }
+                // 低字节
+                for (let bit = 7; bit >= 0; bit--) {
+                    const bitVal = (lowByte >> bit) & 1;
+                    result += bitVal === 0 ? SYMBOL_ZERO : SYMBOL_ONE;
+                }
+            }
+            return result;
+        }
+
+        // 解密函数: 将“导管”密文转为普通字符串
+        function decryptText(cipher) {
+            if (!cipher) return '';
+            // 只保留有效的导管字符（但应尽量保证输入纯净，如果有其他字符会破坏长度）
+            // 不过为了容错，我们只保留 '导' 和 '管'
+            const clean = cipher.replace(/[^导管]/g, '');
+            if (clean.length === 0) return '';
+            if (clean.length % 8 !== 0) {
+                // 长度不是8的倍数，无法完整解密，返回提示（但也可以尽量解部分）
+                // 为了友好，我们返回已解出的部分，并在末尾加提示? 但按需求应完整解密，所以返回错误提示。
+                // 但为避免卡死，我们在此返回空或者截断？最好在UI层提醒，但这里简单处理：返回错误信息。
+                // 因为界面会有提示，但为了不返回混乱结果，返回空字符串并让UI提示。我们在外层处理。
+                throw new Error('密文长度必须是8的倍数（每8个「导管」代表一个字节）');
+            }
+
+            const totalBytes = clean.length / 8;
+            if (totalBytes % 2 !== 0) {
+                throw new Error('密文字节数必须是偶数（每两个字节代表一个字符）');
+            }
+
+            let result = '';
+            for (let byteIndex = 0; byteIndex < totalBytes; byteIndex += 2) {
+                // 第一个字节（高字节）
+                let highByte = 0;
+                for (let i = 0; i < 8; i++) {
+                    const ch = clean[byteIndex * 8 + i];
+                    highByte = (highByte << 1) | (ch === SYMBOL_ONE ? 1 : 0);
+                }
+                // 第二个字节（低字节）
+                let lowByte = 0;
+                for (let i = 0; i < 8; i++) {
+                    const ch = clean[(byteIndex + 1) * 8 + i];
+                    lowByte = (lowByte << 1) | (ch === SYMBOL_ONE ? 1 : 0);
+                }
+                const code = (highByte << 8) | lowByte;
+                result += String.fromCharCode(code);
+            }
+            return result;
+        }
+
+        // ----- 界面逻辑 -----
+        const inputEl = document.getElementById('inputText');
+        const outputEl = document.getElementById('outputText');
+        const encryptBtn = document.getElementById('encryptBtn');
+        const decryptBtn = document.getElementById('decryptBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // 加密按钮
+        encryptBtn.addEventListener('click', () => {
+            const plain = inputEl.value;
+            if (!plain) {
+                outputEl.value = '';
+                return;
+            }
+            try {
+                const cipher = encryptText(plain);
+                outputEl.value = cipher;
+            } catch (e) {
+                outputEl.value = '❌ 加密出错: ' + e.message;
+            }
+        });
+
+        // 解密按钮
+        decryptBtn.addEventListener('click', () => {
+            const cipher = inputEl.value;
+            if (!cipher.trim()) {
+                outputEl.value = '';
+                return;
+            }
+            try {
+                // 先简单清理一下：去掉空格和换行？但密文可能包含空格吗？我们加密只输出导管，但用户可能粘贴带空格。
+                // 为了更宽容，我们保留所有“导管”字符，忽略其他。
+                const plain = decryptText(cipher);
+                outputEl.value = plain;
+            } catch (e) {
+                outputEl.value = '❌ 解密失败: ' + e.message;
+            }
+        });
+
+        // 清空
+        clearBtn.addEventListener('click', () => {
+            inputEl.value = '';
+            outputEl.value = '';
+            inputEl.focus();
+        });
+
+        // 复制结果
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = outputEl.value;
+            if (!textToCopy) {
+                alert('没有可复制的结果');
+                return;
+            }
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // 临时反馈
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ 已复制';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 1200);
+            }).catch(() => {
+                alert('复制失败，请手动选择复制');
+            });
+        });
+
+        // 额外小优化：输入框支持 Ctrl+Enter 加密
+        inputEl.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                encryptBtn.click();
+            }
+        });
+
+        // 解密时若密文包含非导管字符，自动忽略并重新整理？但我们的解密函数已经会过滤，但过滤后若长度不对会报错。
+        // 更好的做法：如果直接点击解密时，输入里包含非导管字符，我们可以在解密前自动清理并重新填入输入框？不需要。
+        // 但为了用户友好，我们可以在解密时，如果输入含有非导管字符，自动提取导管部分并重新设置到输入框，方便用户看到。
+        // 但也可以不修改输入框。在decryptBtn点击时，如果过滤后和原输入不同，我们可以提示用户？
+        // 这里简单处理：不修改输入框，仅用过滤后的密文解密。
+        // 为了直观，我们可以解出结果并显示。
+
+        // 但有个小问题：如果用户输入 "导 管 导 管..." 带有空格，过滤后长度正确，可以正常解密。
+        // 所以不需要额外处理。
+
+        // 另外，如果用户输入明文含特殊字符，加密均能处理（因为按UTF-16）。
+        // 最后，初始化聚焦。
+        window.addEventListener('load', () => {
+            inputEl.focus();
+        });
+
+        // 备注：字符编码使用 UTF-16 码元，所以 emoji 等代理对会被当成两个字符处理，但加密解密依然能还原。
+        // 完全可逆。
+    })();
+</script>
+</body>
+</html>
