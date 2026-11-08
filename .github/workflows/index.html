@@ -405,6 +405,130 @@
         .dialog-buttons button:active {
             transform: translateY(0);
         }
+
+        /* ===== 右下角形状切换按钮（简约无文字、悬停无提示版） ===== */
+        .shape-toggle-btn {
+            position: fixed;
+            right: 26px;
+            bottom: 26px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(145deg, #2c3548, #232b3a);
+            border: 1px solid rgba(120, 160, 255, 0.25);
+            cursor: pointer;
+            z-index: 900;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.55),
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            outline: none;
+            padding: 0;
+            /* 圆形初始 */
+            border-radius: 50%;
+        }
+
+        .shape-toggle-btn::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: inherit;
+            background: radial-gradient(circle at 30% 25%, rgba(140, 180, 255, 0.25), transparent 70%);
+            opacity: 0.8;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .shape-toggle-btn:hover {
+            background: linear-gradient(145deg, #35405a, #2a3346);
+            border-color: rgba(150, 190, 255, 0.55);
+            box-shadow: 
+                0 12px 28px rgba(0, 0, 0, 0.65),
+                0 0 18px rgba(100, 150, 255, 0.35),
+                inset 0 1px 2px rgba(255, 255, 255, 0.12);
+            transform: scale(1.06);
+        }
+
+        .shape-toggle-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* 内部图标容器 */
+        .shape-toggle-btn .shape-icon {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 圆形状态：一个圆环 */
+        .shape-toggle-btn .shape-icon::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(180, 210, 255, 0.9);
+            background: transparent;
+            transition: all 0.35s ease;
+            box-shadow: 0 0 10px rgba(120, 170, 255, 0.5);
+        }
+
+        /* 正方形状态 */
+        .shape-toggle-btn.shape-square .shape-icon::before {
+            border-radius: 3px;
+            width: 16px;
+            height: 16px;
+            border-width: 2.5px;
+            border-color: rgba(180, 210, 255, 0.95);
+            background: rgba(140, 180, 255, 0.08);
+            box-shadow: 0 0 12px rgba(120, 170, 255, 0.55);
+        }
+
+        /* 三角形状态 */
+        .shape-toggle-btn.shape-triangle .shape-icon::before {
+            width: 0;
+            height: 0;
+            border-radius: 0;
+            border: none;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 16px solid rgba(180, 210, 255, 0.95);
+            background: transparent;
+            box-shadow: 0 0 14px rgba(120, 170, 255, 0.65);
+            filter: drop-shadow(0 0 4px rgba(100, 160, 255, 0.6));
+        }
+
+        /* 正方形/三角形时按钮边框也略变 */
+        .shape-toggle-btn.shape-square {
+            border-radius: 14px;
+            border-color: rgba(140, 180, 255, 0.35);
+        }
+
+        .shape-toggle-btn.shape-triangle {
+            border-radius: 16px;
+            border-color: rgba(140, 180, 255, 0.35);
+            background: linear-gradient(145deg, #2e384d, #252d3d);
+        }
+
+        /* 去掉点击高亮 */
+        .shape-toggle-btn:focus {
+            outline: none;
+        }
+        .shape-toggle-btn::-moz-focus-inner {
+            border: 0;
+        }
+
+        /* 确保不显示任何原生提示 */
+        .shape-toggle-btn::after {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -489,6 +613,11 @@
         </div>
     </div>
 
+    <!-- 右下角形状切换按钮（无 title，悬停无任何提示） -->
+    <button id="shapeToggleBtn" class="shape-toggle-btn">
+        <span class="shape-icon"></span>
+    </button>
+
     <script>
         (function() {
             // ---- DOM 元素 ----
@@ -508,6 +637,9 @@
             const easterYes = document.getElementById('easterYes');
             const easterNo = document.getElementById('easterNo');
 
+            // 形状切换按钮
+            const shapeToggleBtn = document.getElementById('shapeToggleBtn');
+
             // ---- 默认密钥 ----
             const DEFAULT_KEY = 'secret-pipe';
             const DEFAULT_TEXT = '导·管 加密器';
@@ -526,8 +658,6 @@
             }
 
             // ---- 核心加密/解密算法 ----
-            // 明文 -> UTF-8字节 -> 与密钥循环异或 -> 每字节8位二进制
-            // 0映射为「导」，1映射为「管」，得到纯「导」「管」密文
             function encryptText(text, key) {
                 if (!text) return '';
                 if (!key) key = DEFAULT_KEY;
@@ -609,13 +739,12 @@
                     return;
                 }
 
-                // 🌽 彩蛋检测：如果输入是"玉米"（精确匹配，忽略前后空格）
+                // 🌽 彩蛋检测
                 if (text.trim() === '玉米') {
                     easterDialog.classList.add('show');
-                    return; // 暂停，等待用户选择
+                    return;
                 }
 
-                // 正常加密
                 try {
                     const encrypted = encryptText(text, key);
                     setOutput(encrypted);
@@ -625,7 +754,6 @@
                 }
             }
 
-            // ---- 加密按钮 ----
             encryptBtn.addEventListener('click', handleEncrypt);
 
             // ---- 解密按钮 ----
@@ -654,7 +782,6 @@
 
             // ---- 彩蛋对话框按钮逻辑 ----
             easterYes.addEventListener('click', () => {
-                // 选“是”：输入框保持为「玉米」不变，但加密内容变为 "刘宇翔最帅"
                 const key = keyInput.value.trim() || DEFAULT_KEY;
                 try {
                     const encrypted = encryptText('刘宇翔最帅', key);
@@ -667,7 +794,6 @@
             });
 
             easterNo.addEventListener('click', () => {
-                // 选“否”：正常加密"玉米"
                 const key = keyInput.value.trim() || DEFAULT_KEY;
                 try {
                     const encrypted = encryptText('玉米', key);
@@ -679,7 +805,6 @@
                 easterDialog.classList.remove('show');
             });
 
-            // 按ESC关闭对话框（视为选“否”）
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && easterDialog.classList.contains('show')) {
                     easterNo.click();
@@ -739,7 +864,6 @@
                 outputText.placeholder = '点击 🔒 加密 或 🔓 解密 按钮查看结果（密文仅含「导」「管」）';
             });
 
-            // 方便用 Ctrl+Enter 加密
             inputText.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                     e.preventDefault();
@@ -747,10 +871,92 @@
                 }
             });
 
-            // 点击输出框全选
             outputText.addEventListener('click', () => {
                 if (outputText.value) {
                     outputText.select();
+                }
+            });
+
+            // ======================================================
+            // 右下角形状切换按钮逻辑（无文字、悬停无提示、跳转静默）
+            // 状态: circle -> square -> triangle -> 跳转 + 重置
+            // 若3秒内未完成三次点击则自动复位
+            // ======================================================
+            let shapeState = 'circle';
+            let clickTimer = null;
+            let clickCount = 0;
+            const TARGET_URL = 'https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click';
+            const RESET_TIMEOUT = 3000;
+
+            function resetShape() {
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                }
+                clickCount = 0;
+                shapeState = 'circle';
+                shapeToggleBtn.classList.remove('shape-square', 'shape-triangle');
+                // 不设置任何 title，悬停无提示
+                shapeToggleBtn.removeAttribute('title');
+            }
+
+            function setShape(state) {
+                shapeState = state;
+                shapeToggleBtn.classList.remove('shape-square', 'shape-triangle');
+                // 不设置 title，悬停无提示
+                if (state === 'circle') {
+                    // 无 title
+                } else if (state === 'square') {
+                    shapeToggleBtn.classList.add('shape-square');
+                } else if (state === 'triangle') {
+                    shapeToggleBtn.classList.add('shape-triangle');
+                }
+            }
+
+            shapeToggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (shapeState === 'circle') {
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                    }
+                    clickCount = 1;
+                    setShape('square');
+                    clickTimer = setTimeout(() => {
+                        if (shapeState !== 'circle') {
+                            resetShape();
+                        }
+                    }, RESET_TIMEOUT);
+                    return;
+                }
+
+                if (shapeState === 'square') {
+                    clickCount = 2;
+                    setShape('triangle');
+                    return;
+                }
+
+                if (shapeState === 'triangle') {
+                    clickCount = 3;
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                    }
+                    window.open(TARGET_URL, '_blank');
+                    resetShape();
+                    return;
+                }
+            });
+
+            // 初始化：移除可能存在的 title
+            shapeToggleBtn.removeAttribute('title');
+            setShape('circle');
+
+            window.addEventListener('beforeunload', () => {
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
                 }
             });
         })();
