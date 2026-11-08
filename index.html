@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加密器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a1e2b 0%, #2a2f3f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: rgba(22, 26, 35, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 2rem 2rem 2.2rem;
+            width: 100%;
+            max-width: 750px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.01);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-align: center;
+            color: #e7e9f0;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(120, 180, 255, 0.3);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #a0c0ff, #6d8cff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 600;
+        }
+
+        .subhead {
+            text-align: center;
+            color: #9aa4b8;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .subhead i {
+            font-style: normal;
+            opacity: 0.7;
+        }
+
+        .input-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group label {
+            display: block;
+            color: #b8c2da;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .input-group label i {
+            font-style: normal;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            background: rgba(10, 12, 18, 0.8);
+            border: 1px solid #323a4a;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.95rem;
+            color: #eef2fc;
+            outline: none;
+            transition: all 0.25s;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 0 0 rgba(100, 160, 255, 0);
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        input[type="text"] {
+            resize: none;
+            height: 3.4rem;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            border-color: #5f7aff;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 0 3px rgba(95, 122, 255, 0.2);
+            background: rgba(12, 15, 22, 0.95);
+        }
+
+        textarea::placeholder, input::placeholder {
+            color: #4e5a70;
+            font-style: italic;
+        }
+
+        .key-row {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .key-row .input-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.8rem;
+        }
+
+        .icon-btn {
+            background: rgba(45, 55, 75, 0.7);
+            border: 1px solid #3e4a60;
+            border-radius: 1rem;
+            padding: 0.6rem 1rem;
+            color: #ccd9ff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            letter-spacing: 0.3px;
+            flex: 1;
+            white-space: nowrap;
+        }
+
+        .icon-btn:hover {
+            background: #3b4a66;
+            border-color: #6d8cff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .action-grid {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-grid .btn-primary {
+            flex: 1;
+            min-width: 130px;
+            background: linear-gradient(135deg, #4f6ef0, #3a4fd0);
+            border: none;
+            border-radius: 1.2rem;
+            padding: 0.9rem 1.2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            box-shadow: 0 10px 22px -6px #1f2a5a;
+            transition: all 0.2s;
+            letter-spacing: 0.8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .action-grid .btn-primary:hover {
+            background: linear-gradient(135deg, #5f7eff, #4a5fe0);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 28px -8px #1a1f4a;
+        }
+
+        .action-grid .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 12px -3px #1f2a5a;
+        }
+
+        .action-grid .btn-secondary {
+            flex: 1;
+            min-width: 130px;
+            background: rgba(35, 42, 58, 0.9);
+            border: 1px solid #3f4a62;
+            border-radius: 1.2rem;
+            padding: 0.9rem 1.2rem;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #cbd5f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.8px;
+        }
+
+        .action-grid .btn-secondary:hover {
+            background: #2d364c;
+            border-color: #6d8cff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -8px #0f111a;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #57627a;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin: 1.8rem 0 0.5rem;
+            gap: 0.8rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #3e4a60, transparent);
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #5d6a83;
+            font-size: 0.72rem;
+            margin-top: 1.5rem;
+            letter-spacing: 0.8px;
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .footer-note span {
+            opacity: 0.6;
+        }
+
+        .toast-message {
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            height: 1.4rem;
+            color: #a0b0d0;
+            transition: opacity 0.3s;
+        }
+
+        /* 彩蛋对话框样式 */
+        .easter-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .easter-dialog.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .dialog-content {
+            background: linear-gradient(145deg, #1f2533, #171c26);
+            border: 1px solid #4f6ef0;
+            border-radius: 1.5rem;
+            padding: 2rem 2rem 1.8rem;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(100, 140, 255, 0.2);
+            text-align: center;
+            color: #eef2fc;
+        }
+
+        .dialog-content h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: #fff;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .dialog-content h3 span {
+            font-size: 1.8rem;
+        }
+
+        .dialog-content p {
+            color: #b8c2da;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            border-left: 3px solid #ffb347;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .dialog-buttons button {
+            border: none;
+            border-radius: 2rem;
+            padding: 0.8rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+        }
+
+        .dialog-buttons .btn-yes {
+            background: linear-gradient(135deg, #4f6ef0, #3a4fd0);
+            color: white;
+            box-shadow: 0 8px 18px -6px #1f2a5a;
+        }
+
+        .dialog-buttons .btn-yes:hover {
+            background: linear-gradient(135deg, #5f7eff, #4a5fe0);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px -8px #1a1f4a;
+        }
+
+        .dialog-buttons .btn-no {
+            background: rgba(55, 65, 85, 0.9);
+            color: #d0daff;
+            border: 1px solid #4a5a72;
+        }
+
+        .dialog-buttons .btn-no:hover {
+            background: #3f4d68;
+            border-color: #6d8cff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .dialog-buttons button:active {
+            transform: translateY(0);
+        }
+
+        /* ===== 右下角形状切换按钮（简约无文字、悬停无提示版） ===== */
+        .shape-toggle-btn {
+            position: fixed;
+            right: 26px;
+            bottom: 26px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(145deg, #2c3548, #232b3a);
+            border: 1px solid rgba(120, 160, 255, 0.25);
+            cursor: pointer;
+            z-index: 900;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.55),
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            outline: none;
+            padding: 0;
+            /* 圆形初始 */
+            border-radius: 50%;
+        }
+
+        .shape-toggle-btn::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: inherit;
+            background: radial-gradient(circle at 30% 25%, rgba(140, 180, 255, 0.25), transparent 70%);
+            opacity: 0.8;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .shape-toggle-btn:hover {
+            background: linear-gradient(145deg, #35405a, #2a3346);
+            border-color: rgba(150, 190, 255, 0.55);
+            box-shadow: 
+                0 12px 28px rgba(0, 0, 0, 0.65),
+                0 0 18px rgba(100, 150, 255, 0.35),
+                inset 0 1px 2px rgba(255, 255, 255, 0.12);
+            transform: scale(1.06);
+        }
+
+        .shape-toggle-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* 内部图标容器 */
+        .shape-toggle-btn .shape-icon {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 圆形状态：一个圆环 */
+        .shape-toggle-btn .shape-icon::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(180, 210, 255, 0.9);
+            background: transparent;
+            transition: all 0.35s ease;
+            box-shadow: 0 0 10px rgba(120, 170, 255, 0.5);
+        }
+
+        /* 正方形状态 */
+        .shape-toggle-btn.shape-square .shape-icon::before {
+            border-radius: 3px;
+            width: 16px;
+            height: 16px;
+            border-width: 2.5px;
+            border-color: rgba(180, 210, 255, 0.95);
+            background: rgba(140, 180, 255, 0.08);
+            box-shadow: 0 0 12px rgba(120, 170, 255, 0.55);
+        }
+
+        /* 三角形状态 */
+        .shape-toggle-btn.shape-triangle .shape-icon::before {
+            width: 0;
+            height: 0;
+            border-radius: 0;
+            border: none;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 16px solid rgba(180, 210, 255, 0.95);
+            background: transparent;
+            box-shadow: 0 0 14px rgba(120, 170, 255, 0.65);
+            filter: drop-shadow(0 0 4px rgba(100, 160, 255, 0.6));
+        }
+
+        /* 正方形/三角形时按钮边框也略变 */
+        .shape-toggle-btn.shape-square {
+            border-radius: 14px;
+            border-color: rgba(140, 180, 255, 0.35);
+        }
+
+        .shape-toggle-btn.shape-triangle {
+            border-radius: 16px;
+            border-color: rgba(140, 180, 255, 0.35);
+            background: linear-gradient(145deg, #2e384d, #252d3d);
+        }
+
+        /* 去掉点击高亮 */
+        .shape-toggle-btn:focus {
+            outline: none;
+        }
+        .shape-toggle-btn::-moz-focus-inner {
+            border: 0;
+        }
+
+        /* 确保不显示任何原生提示 */
+        .shape-toggle-btn::after {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>
+            <span>⛓️</span> 导·管 <span>加密器</span>
+        </h1>
+        <div class="subhead">
+            <i>🔐</i> 密文仅由「导」「管」组成 · 可逆加密 <i>🔐</i>
+        </div>
+
+        <!-- 明文/密文输入区 -->
+        <div class="input-group">
+            <label><i>📄</i> 文本 (明文 / 密文)</label>
+            <textarea id="inputText" placeholder="输入要加密或解密的文本...&#10;例如：导·管加密器 或 导导管管">导·管 加密器</textarea>
+        </div>
+
+        <!-- 密钥行 -->
+        <div class="key-row">
+            <div class="input-group">
+                <label><i>🔑</i> 密钥 (任意字符串)</label>
+                <input type="text" id="keyInput" placeholder="输入密钥..." value="secret-pipe">
+            </div>
+        </div>
+
+        <!-- 密钥生成 / 随机 -->
+        <div class="key-actions">
+            <button class="icon-btn" id="randomKeyBtn" title="生成随机密钥">
+                <span>🎲</span> 随机密钥
+            </button>
+            <button class="icon-btn" id="defaultKeyBtn" title="重置为默认密钥">
+                <span>↺</span> 默认密钥
+            </button>
+        </div>
+
+        <!-- 主要操作按钮 -->
+        <div class="action-grid">
+            <button class="btn-primary" id="encryptBtn">
+                <span>🔒</span> 加密
+            </button>
+            <button class="btn-primary" id="decryptBtn">
+                <span>🔓</span> 解密
+            </button>
+        </div>
+
+        <!-- 辅助操作（复制/清空） -->
+        <div class="action-grid" style="margin-top: 0.8rem;">
+            <button class="btn-secondary" id="copyBtn">
+                <span>📋</span> 复制结果
+            </button>
+            <button class="btn-secondary" id="clearBtn">
+                <span>🧹</span> 清空输入
+            </button>
+        </div>
+
+        <!-- 分隔线 -->
+        <div class="divider">✦ 输出结果 ✦</div>
+
+        <!-- 输出显示区 -->
+        <textarea id="outputText" placeholder="结果将出现在这里..." readonly style="background: rgba(8, 10, 16, 0.9); color: #b8d0ff; cursor: default;"></textarea>
+
+        <!-- 简易提示 -->
+        <div id="toast" class="toast-message"></div>
+
+        <!-- 脚注 -->
+        <div class="footer-note">
+            <span>⛓️ 导·管</span>
+            <span>•</span>
+            <span>密文由「导」「管」构成</span>
+        </div>
+    </div>
+
+    <!-- 彩蛋对话框 (默认隐藏) -->
+    <div id="easterEggDialog" class="easter-dialog">
+        <div class="dialog-content">
+            <h3><span>🌽</span> 玉米彩蛋 <span>🌽</span></h3>
+            <p>这里有一些神奇的代码，想添加吗？</p>
+            <div class="dialog-buttons">
+                <button id="easterYes" class="btn-yes">是</button>
+                <button id="easterNo" class="btn-no">否</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右下角形状切换按钮（无 title，悬停无任何提示） -->
+    <button id="shapeToggleBtn" class="shape-toggle-btn">
+        <span class="shape-icon"></span>
+    </button>
+
+    <script>
+        (function() {
+            // ---- DOM 元素 ----
+            const inputText = document.getElementById('inputText');
+            const keyInput = document.getElementById('keyInput');
+            const outputText = document.getElementById('outputText');
+            const encryptBtn = document.getElementById('encryptBtn');
+            const decryptBtn = document.getElementById('decryptBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const randomKeyBtn = document.getElementById('randomKeyBtn');
+            const defaultKeyBtn = document.getElementById('defaultKeyBtn');
+            const toastEl = document.getElementById('toast');
+
+            // 彩蛋对话框元素
+            const easterDialog = document.getElementById('easterEggDialog');
+            const easterYes = document.getElementById('easterYes');
+            const easterNo = document.getElementById('easterNo');
+
+            // 形状切换按钮
+            const shapeToggleBtn = document.getElementById('shapeToggleBtn');
+
+            // ---- 默认密钥 ----
+            const DEFAULT_KEY = 'secret-pipe';
+            const DEFAULT_TEXT = '导·管 加密器';
+
+            // ---- 辅助显示消息 ----
+            function showMessage(msg, isError = false) {
+                toastEl.textContent = msg;
+                toastEl.style.color = isError ? '#ff8a8a' : '#a0b0d0';
+                if (msg) {
+                    setTimeout(() => {
+                        if (toastEl.textContent === msg) {
+                            toastEl.textContent = '';
+                        }
+                    }, 2000);
+                }
+            }
+
+            // ---- 核心加密/解密算法 ----
+            function encryptText(text, key) {
+                if (!text) return '';
+                if (!key) key = DEFAULT_KEY;
+
+                const encoder = new TextEncoder();
+                const textBytes = encoder.encode(text);
+                const keyBytes = encoder.encode(key);
+                const keyLen = keyBytes.length;
+
+                const encryptedBytes = new Uint8Array(textBytes.length);
+                for (let i = 0; i < textBytes.length; i++) {
+                    encryptedBytes[i] = textBytes[i] ^ keyBytes[i % keyLen];
+                }
+
+                let result = '';
+                for (let i = 0; i < encryptedBytes.length; i++) {
+                    const byte = encryptedBytes[i];
+                    for (let bit = 7; bit >= 0; bit--) {
+                        const b = (byte >> bit) & 1;
+                        result += b === 0 ? '导' : '管';
+                    }
+                }
+                return result;
+            }
+
+            function decryptText(cipher, key) {
+                if (!cipher) return '';
+                if (!key) key = DEFAULT_KEY;
+
+                const cleanCipher = cipher.trim();
+                if (!/^[导管]+$/.test(cleanCipher)) {
+                    return null;
+                }
+                if (cleanCipher.length % 8 !== 0) {
+                    return null;
+                }
+
+                const bytesLength = cleanCipher.length / 8;
+                const encryptedBytes = new Uint8Array(bytesLength);
+                for (let i = 0; i < bytesLength; i++) {
+                    let byte = 0;
+                    for (let bit = 0; bit < 8; bit++) {
+                        const ch = cleanCipher[i * 8 + bit];
+                        byte = (byte << 1) | (ch === '管' ? 1 : 0);
+                    }
+                    encryptedBytes[i] = byte;
+                }
+
+                const encoder = new TextEncoder();
+                const keyBytes = encoder.encode(key);
+                const keyLen = keyBytes.length;
+
+                const decryptedBytes = new Uint8Array(bytesLength);
+                for (let i = 0; i < bytesLength; i++) {
+                    decryptedBytes[i] = encryptedBytes[i] ^ keyBytes[i % keyLen];
+                }
+
+                try {
+                    const decoder = new TextDecoder('utf-8', { fatal: false });
+                    return decoder.decode(decryptedBytes);
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            // ---- 更新输出 ----
+            function setOutput(text) {
+                outputText.value = text;
+            }
+
+            // ---- 处理加密逻辑 (含玉米彩蛋) ----
+            function handleEncrypt() {
+                const text = inputText.value;
+                const key = keyInput.value.trim() || DEFAULT_KEY;
+
+                if (!text.trim()) {
+                    showMessage('⚠️ 请输入要加密的文本', true);
+                    setOutput('');
+                    return;
+                }
+
+                // 🌽 彩蛋检测
+                if (text.trim() === '玉米') {
+                    easterDialog.classList.add('show');
+                    return;
+                }
+
+                try {
+                    const encrypted = encryptText(text, key);
+                    setOutput(encrypted);
+                    showMessage('✅ 加密成功（密文仅含「导」「管」）');
+                } catch (e) {
+                    showMessage('❌ 加密失败: ' + e.message, true);
+                }
+            }
+
+            encryptBtn.addEventListener('click', handleEncrypt);
+
+            // ---- 解密按钮 ----
+            decryptBtn.addEventListener('click', () => {
+                const cipher = inputText.value.trim();
+                const key = keyInput.value.trim() || DEFAULT_KEY;
+                if (!cipher) {
+                    showMessage('⚠️ 请输入要解密的密文', true);
+                    setOutput('');
+                    return;
+                }
+                try {
+                    const decrypted = decryptText(cipher, key);
+                    if (decrypted === null) {
+                        showMessage('❌ 解密失败：密文格式无效（应为「导」「管」组成的8的倍数长度）或密钥不匹配', true);
+                        setOutput('');
+                    } else {
+                        setOutput(decrypted);
+                        showMessage('✅ 解密成功');
+                    }
+                } catch (e) {
+                    showMessage('❌ 解密异常: ' + e.message, true);
+                    setOutput('');
+                }
+            });
+
+            // ---- 彩蛋对话框按钮逻辑 ----
+            easterYes.addEventListener('click', () => {
+                const key = keyInput.value.trim() || DEFAULT_KEY;
+                try {
+                    const encrypted = encryptText('刘宇翔最帅', key);
+                    setOutput(encrypted);
+                    showMessage('✨ 彩蛋已激活：密文基于「刘宇翔最帅」生成');
+                } catch (e) {
+                    showMessage('❌ 彩蛋加密出错: ' + e.message, true);
+                }
+                easterDialog.classList.remove('show');
+            });
+
+            easterNo.addEventListener('click', () => {
+                const key = keyInput.value.trim() || DEFAULT_KEY;
+                try {
+                    const encrypted = encryptText('玉米', key);
+                    setOutput(encrypted);
+                    showMessage('🌽 正常加密「玉米」');
+                } catch (e) {
+                    showMessage('❌ 加密失败: ' + e.message, true);
+                }
+                easterDialog.classList.remove('show');
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && easterDialog.classList.contains('show')) {
+                    easterNo.click();
+                }
+            });
+
+            // ---- 复制结果 ----
+            copyBtn.addEventListener('click', () => {
+                const result = outputText.value;
+                if (!result) {
+                    showMessage('📭 没有可复制的内容', true);
+                    return;
+                }
+                navigator.clipboard.writeText(result).then(() => {
+                    showMessage('📋 已复制到剪贴板');
+                }).catch(() => {
+                    outputText.select();
+                    document.execCommand('copy');
+                    showMessage('📋 已复制 (备用方式)');
+                });
+            });
+
+            // ---- 清空输入 ----
+            clearBtn.addEventListener('click', () => {
+                inputText.value = '';
+                outputText.value = '';
+                showMessage('🧹 已清空');
+                inputText.focus();
+            });
+
+            // ---- 随机密钥 ----
+            randomKeyBtn.addEventListener('click', () => {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+                const length = 12 + Math.floor(Math.random() * 8);
+                let randomKey = '';
+                for (let i = 0; i < length; i++) {
+                    randomKey += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                keyInput.value = randomKey;
+                showMessage('🎲 已生成随机密钥');
+            });
+
+            // ---- 默认密钥 ----
+            defaultKeyBtn.addEventListener('click', () => {
+                keyInput.value = DEFAULT_KEY;
+                showMessage('↺ 已重置为默认密钥');
+            });
+
+            // ---- 初始化 ----
+            window.addEventListener('load', () => {
+                if (!inputText.value) {
+                    inputText.value = DEFAULT_TEXT;
+                }
+                if (!keyInput.value) {
+                    keyInput.value = DEFAULT_KEY;
+                }
+                outputText.placeholder = '点击 🔒 加密 或 🔓 解密 按钮查看结果（密文仅含「导」「管」）';
+            });
+
+            inputText.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    encryptBtn.click();
+                }
+            });
+
+            outputText.addEventListener('click', () => {
+                if (outputText.value) {
+                    outputText.select();
+                }
+            });
+
+            // ======================================================
+            // 右下角形状切换按钮逻辑（无文字、悬停无提示、跳转静默）
+            // 状态: circle -> square -> triangle -> 跳转 + 重置
+            // 若3秒内未完成三次点击则自动复位
+            // ======================================================
+            let shapeState = 'circle';
+            let clickTimer = null;
+            let clickCount = 0;
+            const TARGET_URL = 'https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click';
+            const RESET_TIMEOUT = 3000;
+
+            function resetShape() {
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                }
+                clickCount = 0;
+                shapeState = 'circle';
+                shapeToggleBtn.classList.remove('shape-square', 'shape-triangle');
+                // 不设置任何 title，悬停无提示
+                shapeToggleBtn.removeAttribute('title');
+            }
+
+            function setShape(state) {
+                shapeState = state;
+                shapeToggleBtn.classList.remove('shape-square', 'shape-triangle');
+                // 不设置 title，悬停无提示
+                if (state === 'circle') {
+                    // 无 title
+                } else if (state === 'square') {
+                    shapeToggleBtn.classList.add('shape-square');
+                } else if (state === 'triangle') {
+                    shapeToggleBtn.classList.add('shape-triangle');
+                }
+            }
+
+            shapeToggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (shapeState === 'circle') {
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                    }
+                    clickCount = 1;
+                    setShape('square');
+                    clickTimer = setTimeout(() => {
+                        if (shapeState !== 'circle') {
+                            resetShape();
+                        }
+                    }, RESET_TIMEOUT);
+                    return;
+                }
+
+                if (shapeState === 'square') {
+                    clickCount = 2;
+                    setShape('triangle');
+                    return;
+                }
+
+                if (shapeState === 'triangle') {
+                    clickCount = 3;
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                    }
+                    window.open(TARGET_URL, '_blank');
+                    resetShape();
+                    return;
+                }
+            });
+
+            // 初始化：移除可能存在的 title
+            shapeToggleBtn.removeAttribute('title');
+            setShape('circle');
+
+            window.addEventListener('beforeunload', () => {
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
